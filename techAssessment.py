@@ -88,3 +88,51 @@ def findTheNeedle(url_haystack, url_validate, token):
 			return
 		index += 1
 findTheNeedle(url_haystack, url_validate, token)
+
+#Our endpoint to receive a the prefix string and an array of words
+url_prefix = 'http://challenge.code2040.org/api/prefix'
+#The URL to post our JSON object
+url_validate = 'http://challenge.code2040.org/api/prefix/validate'
+
+
+def removePrefix(url_prefix, url_validate, token):
+	"""Return an array containing only the strings that do not start with the
+	prefix """
+	#This is a dictionary holding my token key
+	payload = {
+		'token': token
+	}
+
+	#Sending a post request with a dictionary holding my token
+	r = requests.post(url_prefix, data=payload)
+	#Initialize dictionary to the dictionary obtained by the post request
+	my_dict = r.json()
+	#Initialize a variable called prefix the key value of prefix which should hold the string prefix
+	prefix = my_dict['prefix']
+	#Obtain the length the prefix
+	length_of_prefix = len(prefix)
+	#Initialize this array to the array of string I got back from the post request
+	my_array = my_dict["array"]
+	#Create a new array to hold all the string values that do not start
+	#with the prefix
+	new_array = []
+	#array will transverse through the array of string and
+	#checking the condition where a word in the array 
+	#does not start with the prefix
+	for word in my_array:
+		if not (word[:length_of_prefix] == prefix):
+			new_array.append(str(word))
+
+
+	#Initializing a new dictinary to hold the token and new array 
+	#without words starting with the prefix
+	payload = {
+		'token': token,
+		'array': new_array
+	}
+	r = requests.post(url_validate, json=payload)
+	print r.content
+#Calling the function and passing in three argumnets which consists of
+#Our prefix url to obtain our dictionary, url to validate our dictionary, and 
+#our token
+removePrefix(url_prefix, url_validate, token)
