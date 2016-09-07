@@ -136,3 +136,52 @@ def removePrefix(url_prefix, url_validate, token):
 #Our prefix url to obtain our dictionary, url to validate our dictionary, and 
 #our token
 removePrefix(url_prefix, url_validate, token)
+
+##Our endpoint to receive a string value formatted as IOS 8601 datestamp
+#and also an integer value storing the number of seconds
+url_dating = 'http://challenge.code2040.org/api/dating'
+#The URL to post our JSON object
+url_validate = 'http://challenge.code2040.org/api/dating/validate'
+def datingGame(url_dating, url_validate, token):
+	#This is a dictionary holding my token key
+	payload = {
+		'token': '03cbcbfd47031937a28ff8bb5eccb71a'
+	}
+	#Sending a post request with a dictionary holding my token
+	r = requests.post(url_dating, json=payload)
+	#Initialize dictionary to the dictionary obtained by the post request
+	my_dict = r.json()
+	#Interval variable will hold the value of key interval
+	interval = my_dict["interval"]
+	#Datestamp variable will hold the value of key datestamp
+	datestamp = str(my_dict["datestamp"])
+	#Obtaining the substring for the time in our datestamp string
+	time = str(datestamp[11:19])
+	hours = int(time[0:2])
+	minutes = int(time[3:5])
+	seconds = int(time[6:])
+	#Time will be initialized to datetime object
+	time = datetime.time(hours, minutes, seconds)
+	#Obtaining the substring for the date in our datestamp string
+	yearMonthDay = datestamp[0:10]
+	day = int(yearMonthDay[8:])
+	year = int(yearMonthDay[0:4])
+	month = int(yearMonthDay[5:7])
+	#StartDate will be initialized to datetime object
+	startDate = datetime.date(year, month, day)
+	#Create an object holding our date and time together
+	dateAndTime = datetime.datetime.combine(startDate, time)
+	#Add the number of seconds to the object to obtain the new date
+	endDate = dateAndTime + datetime.timedelta(seconds = interval)
+	endDate = str(endDate)
+	#Format the newDate
+	newDate = endDate[0:10] + "T" + endDate[11:] + "Z";
+	#Dictionary holding the token and new date
+	payload = {
+		'token': token,
+		'datestamp': newDate
+	}
+	#Post method to send the JSON object
+	r = requests.post(url_validate, json=payload)
+	print r.content
+datingGame(url_dating, url_validate, token)
