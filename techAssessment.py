@@ -50,3 +50,41 @@ def reverseString(url_reverse, url_validate, token):
 	r = requests.post(url_validate, data = payload)
 	print(r.content)
 reverseString(url_reverse, url_validate, token)
+
+#Our endpoint to receive a specific word (needle) and an array of strings (haystack)
+url_haystack = 'http://challenge.code2040.org/api/haystack'
+#The URL to post our JSON object
+url_validate = 'http://challenge.code2040.org/api/haystack/validate'
+
+def findTheNeedle(url_haystack, url_validate, token):
+	"""Find a specific string in an array of string values. Locate and return
+	the index the string"""
+	#Dictionary with the key being our token
+	payload = {
+		'token': token
+	}
+	#Our post method to the endpoint which will return a string word and
+	#an array of strings
+	r = requests.post(url_haystack, data=payload)
+	#Empty dictionary to store JSON object from the post method
+	my_dict = {}
+	my_dict = r.json()
+	#Storing the array of strings
+	haystack = my_dict['haystack']
+	#Storing the string word 
+	needle = my_dict['needle']
+	#Variable to keep track of the current index
+	index = 0
+	#A for loop to transverse through the array of strings
+	#to locate the target word
+	for hay in haystack:
+		if(hay == needle):
+			payload = {
+				'token': token,
+				'needle': index
+			}
+			r = requests.post(url_validate, data=payload)
+			print r.content
+			return
+		index += 1
+findTheNeedle(url_haystack, url_validate, token)
